@@ -1,0 +1,219 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>autocrop</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-11-23"><meta name="DC.source" content="autocrop.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Autocrop</a></li><li><a href="#2">Batch autocrop</a></li></ul></div><h2>Autocrop<a name="1"></a></h2><p>Performs batch or single image cropping.</p><p>Location argument is specified as <i>dir('segm</i>*.jpg')_ in case of folder or <i>filename</i> in case of single file.</p><pre class="codeinput"><span class="keyword">function</span> autocrop(location)
+    <span class="keyword">try</span>
+        <span class="keyword">for</span> file = 1:length(location)
+            display(strcat(<span class="string">'Processing: '</span>, location(file).name))
+            <span class="keyword">if</span> not(isempty(location))
+                batch_autocrop(location(file).name)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">catch</span>
+        display(strcat(<span class="string">'Processing: '</span>, location))
+        batch_autocrop(location)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Batch autocrop<a name="2"></a></h2><p>Performs automated cropping of segmented image</p><pre class="codeinput"><span class="keyword">function</span> batch_autocrop(filename)
+    <span class="comment">% Find the xmin and ymin values of cropping rectangle</span>
+    i = imread(filename);
+    g = rgb2gray(i);
+    isize = size(g);
+
+    <span class="comment">% Calculate ymin value for crop rectangle</span>
+    <span class="keyword">for</span> row = 1:isize(1)
+        <span class="comment">%display(g(row, :)); % display row</span>
+        x = g(row, :);
+        <span class="keyword">if</span> sum(x) ~= 0 &amp;&amp; sum(x) &gt; 5000 <span class="comment">% TODO: fix it</span>
+            irow = row; <span class="comment">% non-zero row index (y for crop rectangle)</span>
+            <span class="keyword">break</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Calculate xmin value for crop rectangle</span>
+    <span class="keyword">for</span> column = 1:isize(2)
+        y = g(:, column);
+        <span class="keyword">if</span> sum(y) ~= 0 &amp;&amp; sum(y) &gt; 5000 <span class="comment">% TODO: fix it</span>
+            icolumn = column; <span class="comment">% non-zero column index (x for crop rectangle)</span>
+            <span class="keyword">break</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    rect = [icolumn, irow, isize(2), isize(1)];
+    i2 = imcrop(i, rect);
+    imwrite(i2, <span class="string">'temp.jpg'</span>);
+
+    <span class="comment">% Find the height and width values of cropping rectangle</span>
+    temp = imread(<span class="string">'temp.jpg'</span>);
+    g = rgb2gray(temp);
+    isize = size(g);
+
+    <span class="comment">% Calculate height value for crop rectangle</span>
+    <span class="keyword">for</span> row = 1:isize(1)
+        x = g(row, :);
+        <span class="keyword">if</span> sum(x) == 0
+            height = row; <span class="comment">% zero row index (y for crop rectangle)</span>
+            <span class="keyword">break</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Calculate width value for crop rectangle</span>
+    <span class="keyword">for</span> column = 1:isize(2)
+        y = g(:, column);
+        <span class="keyword">if</span> sum(y) == 0
+            width = column; <span class="comment">% zero column index (x for crop rectangle)</span>
+            <span class="keyword">break</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    rect = [icolumn, irow, width, height];
+    i2 = imcrop(i, rect);
+    imwrite(i2, strcat(<span class="string">'crop_'</span>, filename));
+    delete(<span class="string">'temp.jpg'</span>);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Autocrop
+% Performs batch or single image cropping.
+%
+% Location argument is specified as _dir('segm_*.jpg')_ in
+% case of folder or _filename_ in case of single file.
+function autocrop(location)
+    try
+        for file = 1:length(location)
+            display(strcat('Processing: ', location(file).name))
+            if not(isempty(location))
+                batch_autocrop(location(file).name)
+            end
+        end
+    catch
+        display(strcat('Processing: ', location))
+        batch_autocrop(location)
+    end
+end
+
+%% Batch autocrop
+% Performs automated cropping of segmented image
+function batch_autocrop(filename)
+    % Find the xmin and ymin values of cropping rectangle
+    i = imread(filename);
+    g = rgb2gray(i);
+    isize = size(g);
+
+    % Calculate ymin value for crop rectangle
+    for row = 1:isize(1)
+        %display(g(row, :)); % display row
+        x = g(row, :);
+        if sum(x) ~= 0 && sum(x) > 5000 % TODO: fix it
+            irow = row; % non-zero row index (y for crop rectangle)
+            break
+        end
+    end
+
+    % Calculate xmin value for crop rectangle
+    for column = 1:isize(2)
+        y = g(:, column);
+        if sum(y) ~= 0 && sum(y) > 5000 % TODO: fix it
+            icolumn = column; % non-zero column index (x for crop rectangle)
+            break
+        end
+    end
+    rect = [icolumn, irow, isize(2), isize(1)];
+    i2 = imcrop(i, rect);
+    imwrite(i2, 'temp.jpg');
+
+    % Find the height and width values of cropping rectangle
+    temp = imread('temp.jpg');
+    g = rgb2gray(temp);
+    isize = size(g);
+
+    % Calculate height value for crop rectangle
+    for row = 1:isize(1)
+        x = g(row, :);
+        if sum(x) == 0
+            height = row; % zero row index (y for crop rectangle)
+            break
+        end
+    end
+
+    % Calculate width value for crop rectangle
+    for column = 1:isize(2)
+        y = g(:, column);
+        if sum(y) == 0
+            width = column; % zero column index (x for crop rectangle)
+            break
+        end
+    end
+
+    rect = [icolumn, irow, width, height];
+    i2 = imcrop(i, rect);
+    imwrite(i2, strcat('crop_', filename));
+    delete('temp.jpg');
+end
+
+##### SOURCE END #####
+--></body></html>
