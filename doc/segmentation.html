@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Image segmentation</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-11-23"><meta name="DC.source" content="segmentation.m"><style type="text/css">
+      --><title>Image segmentation</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-11-24"><meta name="DC.source" content="segmentation.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,63 +66,90 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Image segmentation</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Segmentation</a></li><li><a href="#2">Simple image segmentation</a></li></ul></div><h2>Segmentation<a name="1"></a></h2><p>Performs batch or single image segmentation using the predefined threshold value.</p><p>Location argument is specified as <i>dir('*.jpg')</i> in case of folder or <i>filename</i> in case of single file.</p><pre class="codeinput"><span class="keyword">function</span> segmentation(location, threshold)
-    <span class="keyword">try</span>
-        <span class="keyword">for</span> file = 1:length(location)
-            display(strcat(<span class="string">'Processing: '</span>, location(file).name))
-            <span class="keyword">if</span> not(isempty(location))
-                simple_segmentation(location(file).name, threshold)
-            <span class="keyword">end</span>
+  </style></head><body><div class="content"><h1>Image segmentation</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Segmentation</a></li><li><a href="#2">Segmentation without threshold</a></li><li><a href="#3">Segmentation with threshold</a></li></ul></div><h2>Segmentation<a name="1"></a></h2><p>Performs batch or single image segmentation.</p><p>Location argument is specified as <i>dir('*.jpg')</i> in case of folder or <i>filename</i> in case of single file.</p><pre class="codeinput"><span class="keyword">function</span> segmentation(location)
+<span class="comment">%function segmentation(location, threshold)</span>
+    <span class="keyword">for</span> file = 1:length(location)
+        display(strcat(<span class="string">'Processing: '</span>, location(file).name))
+        <span class="keyword">if</span> not(isempty(location))
+            segmentation_wo_threshold(location(file).name)
+            <span class="comment">%segmentation_w_threshold(location(file).name, threshold)</span>
         <span class="keyword">end</span>
-    <span class="keyword">catch</span>
-        display(strcat(<span class="string">'Processing: '</span>, location))
-        simple_segmentation(location, threshold)
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-</pre><h2>Simple image segmentation<a name="2"></a></h2><p>Performs simple image segmentation based on provided threshold</p><pre class="codeinput"><span class="keyword">function</span> simple_segmentation(filename, threshold)
-    <span class="comment">%warning('off', 'MATLAB:MKDIR:DirectoryExists');</span>
-    <span class="comment">%mkdir('output');</span>
+</pre><h2>Segmentation without threshold<a name="2"></a></h2><p>Performs simple image segmentation using the calculated threshold.</p><pre class="codeinput"><span class="keyword">function</span> segmentation_wo_threshold(filename)
+    i = imread(filename);
+    gray = rgb2gray(i);
+    s = size(gray);
+    <span class="comment">% Calculate the mean intensity for 4 small</span>
+    <span class="comment">%rectangles in the corner of image</span>
+    r1 = mean2(imcrop(gray, [0,0,200,200]));
+    r2 = mean2(imcrop(gray, [0, s(1) - 200, 200, 200]));
+    r3 = mean2(imcrop(gray, [s(2) - 200, 0, 200, 200]));
+    r4 = mean2(imcrop(gray, [s(2) - 200, s(1) - 200, 200, 200]));
+    threshold = mean2([r1, r2, r3, r4]);
+    <span class="comment">% Perform the segmentation</span>
+    bw = gray &lt; threshold;
+    <span class="comment">% Fill the holes</span>
+    bw = imfill(bw, <span class="string">'holes'</span>);
+    n = i .* repmat(uint8(bw), [1, 1, 3]);
+    imwrite(n, strcat(<span class="string">'segm_wo_'</span>, filename));
+<span class="keyword">end</span>
+</pre><h2>Segmentation with threshold<a name="3"></a></h2><p>Performs simple image segmentation using the predefined threshold.</p><pre class="codeinput"><span class="keyword">function</span> segmentation_w_threshold(filename, threshold)
     i = imread(filename);
     bw = rgb2gray(i) &lt; threshold;
     n = i .* repmat(uint8(bw), [1, 1, 3]);
-    <span class="comment">%imwrite(n, fullfile('output', strcat('segm_', filename)));</span>
-    imwrite(n, strcat(<span class="string">'segm_'</span>, filename));
+    imwrite(n, strcat(<span class="string">'segm_w_'</span>, filename));
 <span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Image segmentation
 
 %% Segmentation
-% Performs batch or single image segmentation 
-% using the predefined threshold value.
+% Performs batch or single image segmentation.
 %
 % Location argument is specified as _dir('*.jpg')_ in
 % case of folder or _filename_ in case of single file.
-function segmentation(location, threshold)
-    try
-        for file = 1:length(location)
-            display(strcat('Processing: ', location(file).name))
-            if not(isempty(location))
-                simple_segmentation(location(file).name, threshold)
-            end
+function segmentation(location)
+%function segmentation(location, threshold)
+    for file = 1:length(location)
+        display(strcat('Processing: ', location(file).name))
+        if not(isempty(location))
+            segmentation_wo_threshold(location(file).name)
+            %segmentation_w_threshold(location(file).name, threshold)
         end
-    catch
-        display(strcat('Processing: ', location))
-        simple_segmentation(location, threshold)
     end
 end
 
-%% Simple image segmentation
+%% Segmentation without threshold
 % Performs simple image segmentation
-% based on provided threshold
-function simple_segmentation(filename, threshold)
-    %warning('off', 'MATLAB:MKDIR:DirectoryExists');
-    %mkdir('output');
+% using the calculated threshold.
+function segmentation_wo_threshold(filename)
+    i = imread(filename);
+    gray = rgb2gray(i);
+    s = size(gray);
+    % Calculate the mean intensity for 4 small 
+    %rectangles in the corner of image
+    r1 = mean2(imcrop(gray, [0,0,200,200]));
+    r2 = mean2(imcrop(gray, [0, s(1) - 200, 200, 200]));
+    r3 = mean2(imcrop(gray, [s(2) - 200, 0, 200, 200]));
+    r4 = mean2(imcrop(gray, [s(2) - 200, s(1) - 200, 200, 200]));
+    threshold = mean2([r1, r2, r3, r4]);
+    % Perform the segmentation
+    bw = gray < threshold;
+    % Fill the holes
+    bw = imfill(bw, 'holes');
+    n = i .* repmat(uint8(bw), [1, 1, 3]);
+    imwrite(n, strcat('segm_wo_', filename));
+end
+
+%% Segmentation with threshold
+% Performs simple image segmentation
+% using the predefined threshold.
+function segmentation_w_threshold(filename, threshold)
     i = imread(filename);
     bw = rgb2gray(i) < threshold;
     n = i .* repmat(uint8(bw), [1, 1, 3]);
-    %imwrite(n, fullfile('output', strcat('segm_', filename)));
-    imwrite(n, strcat('segm_', filename));
+    imwrite(n, strcat('segm_w_', filename));
 end
 ##### SOURCE END #####
 --></body></html>

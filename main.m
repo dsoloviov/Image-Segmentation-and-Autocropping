@@ -16,7 +16,8 @@ function main()
         if isdir(file)
             try
                 cd(file);
-                segmentation(dir('*.jpg'), 210);
+                segmentation(dir('*.jpg'));
+                %segmentation(dir('*.jpg'), 210);
                 autocrop(dir('segm*.jpg'));
                 cd(input);
             catch

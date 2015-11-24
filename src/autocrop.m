@@ -1,3 +1,5 @@
+%% Image Autocrop
+
 %% Autocrop
 % Performs batch or single image cropping.
 %

@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Image segmentation and cropping</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-11-23"><meta name="DC.source" content="main.m"><style type="text/css">
+      --><title>Image segmentation and cropping</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-11-24"><meta name="DC.source" content="main.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Image segmentation and cropping</h1><p>Performs automated image segmentation and cropping. Process images inside the \input folder and inside all subfolders within \input folder.</p><pre class="codeinput"><span class="keyword">function</span> main()
+  </style></head><body><div class="content"><h1>Image segmentation and cropping</h1><p>Performs automated image segmentation and cropping. Processes images inside the \input folder and inside all subfolders within \input folder.</p><pre class="codeinput"><span class="keyword">function</span> main()
     addpath(fullfile(pwd, <span class="string">'src'</span>));
     import <span class="string">segmentation.*</span>
     import <span class="string">autocrop.*</span>
@@ -80,7 +80,8 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
         <span class="keyword">if</span> isdir(file)
             <span class="keyword">try</span>
                 cd(file);
-                segmentation(dir(<span class="string">'*.jpg'</span>), 210);
+                segmentation(dir(<span class="string">'*.jpg'</span>));
+                <span class="comment">%segmentation(dir('*.jpg'), 210);</span>
                 autocrop(dir(<span class="string">'segm*.jpg'</span>));
                 cd(input);
             <span class="keyword">catch</span>
@@ -93,7 +94,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 ##### SOURCE BEGIN #####
 %% Image segmentation and cropping
 % Performs automated image segmentation and cropping.
-% Process images inside the \input folder and inside all
+% Processes images inside the \input folder and inside all
 % subfolders within \input folder.
 function main()
     addpath(fullfile(pwd, 'src'));
@@ -109,7 +110,8 @@ function main()
         if isdir(file)
             try
                 cd(file);
-                segmentation(dir('*.jpg'), 210);
+                segmentation(dir('*.jpg'));
+                %segmentation(dir('*.jpg'), 210);
                 autocrop(dir('segm*.jpg'));
                 cd(input);
             catch
